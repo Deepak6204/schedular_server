@@ -6,6 +6,91 @@ const router = express.Router();
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     Task:
+ *       type: object
+ *       required:
+ *         - id
+ *         - title
+ *         - date
+ *         - startTime
+ *         - endTime
+ *         - category
+ *         - isStaticSchedule
+ *         - status
+ *         - priority
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440000"
+ *         title:
+ *           type: string
+ *           example: "Team Meeting"
+ *         date:
+ *           type: string
+ *           format: date
+ *           example: "2023-05-15"
+ *         startTime:
+ *           type: string
+ *           pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+ *           example: "09:00"
+ *         endTime:
+ *           type: string
+ *           pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+ *           example: "10:00"
+ *         location:
+ *           type: string
+ *           nullable: true
+ *           example: "Conference Room A"
+ *         category:
+ *           type: string
+ *           example: "Meeting"
+ *         isStaticSchedule:
+ *           type: boolean
+ *           example: false
+ *         status:
+ *           type: string
+ *           enum: [pending, completed]
+ *           default: pending
+ *           example: "pending"
+ *         priority:
+ *           type: string
+ *           enum: [low, medium, high]
+ *           default: medium
+ *           example: "medium"
+ *         duration:
+ *           type: integer
+ *           example: 60
+ * 
+ *     ErrorResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: false
+ *         error:
+ *           type: string
+ *           example: "Invalid input data"
+ *         details:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               param:
+ *                 type: string
+ *                 example: "title"
+ *               message:
+ *                 type: string
+ *                 example: "Title is required"
+ *               location:
+ *                 type: string
+ *                 example: "body"
+ */
+
+/**
+ * @swagger
  * tags:
  *   name: Tasks
  *   description: Task management endpoints
@@ -52,13 +137,30 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Task'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Task'
+ *                 message:
+ *                   type: string
+ *                   example: "Tasks retrieved successfully"
  *       400:
  *         description: Invalid query parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/', TaskValidator.getTasks, TaskController.getTasks);
 
@@ -73,18 +175,68 @@ router.get('/', TaskValidator.getTasks, TaskController.getTasks);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/TaskInput'
+ *             type: object
+ *             required:
+ *               - title
+ *               - date
+ *               - startTime
+ *               - endTime
+ *               - category
+ *               - isStaticSchedule
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "Team Meeting"
+ *               date:
+ *                 type: string
+ *                 format: date
+ *                 example: "2023-05-15"
+ *               startTime:
+ *                 type: string
+ *                 pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+ *                 example: "09:00"
+ *               endTime:
+ *                 type: string
+ *                 pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+ *                 example: "10:00"
+ *               location:
+ *                 type: string
+ *                 nullable: true
+ *                 example: "Conference Room A"
+ *               category:
+ *                 type: string
+ *                 example: "Meeting"
+ *               isStaticSchedule:
+ *                 type: boolean
+ *                 example: false
  *     responses:
  *       201:
  *         description: Task created successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Task'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/Task'
+ *                 message:
+ *                   type: string
+ *                   example: "Task created successfully"
  *       400:
  *         description: Invalid input data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/', TaskValidator.createTask, TaskController.createTask);
 
@@ -107,20 +259,75 @@ router.post('/', TaskValidator.createTask, TaskController.createTask);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/TaskUpdate'
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "Updated Team Meeting"
+ *               date:
+ *                 type: string
+ *                 format: date
+ *                 example: "2023-05-15"
+ *               startTime:
+ *                 type: string
+ *                 pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+ *                 example: "10:00"
+ *               endTime:
+ *                 type: string
+ *                 pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+ *                 example: "11:00"
+ *               location:
+ *                 type: string
+ *                 nullable: true
+ *                 example: "Conference Room B"
+ *               category:
+ *                 type: string
+ *                 example: "Important Meeting"
+ *               isStaticSchedule:
+ *                 type: boolean
+ *                 example: true
+ *               status:
+ *                 type: string
+ *                 enum: [pending, completed]
+ *                 example: "pending"
+ *               priority:
+ *                 type: string
+ *                 enum: [low, medium, high]
+ *                 example: "high"
  *     responses:
  *       200:
  *         description: Task updated successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Task'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/Task'
+ *                 message:
+ *                   type: string
+ *                   example: "Task updated successfully"
  *       400:
- *         description: Invalid input data or task not found
+ *         description: Invalid input data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Task not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.put('/:taskId', TaskValidator.updateTask, TaskController.updateTask);
 
@@ -149,170 +356,28 @@ router.put('/:taskId', TaskValidator.updateTask, TaskController.updateTask);
  *                 success:
  *                   type: boolean
  *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Task deleted successfully"
  *       400:
  *         description: Invalid task ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Task not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       500:
  *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.delete('/:taskId', TaskValidator.deleteTask, TaskController.deleteTask);
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     Task:
- *       type: object
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *           description: The auto-generated UUID for the task
- *         title:
- *           type: string
- *           description: The title of the task
- *         date:
- *           type: string
- *           format: date
- *           description: The date of the task (YYYY-MM-DD)
- *         startTime:
- *           type: string
- *           format: time
- *           pattern: '^\d{2}:\d{2}$'
- *           description: The start time of the task (HH:MM)
- *         endTime:
- *           type: string
- *           format: time
- *           pattern: '^\d{2}:\d{2}$'
- *           description: The end time of the task (HH:MM)
- *         location:
- *           type: string
- *           description: The location of the task
- *         category:
- *           type: string
- *           description: The category of the task
- *         isStaticSchedule:
- *           type: boolean
- *           description: Whether the task is part of a static schedule
- *         status:
- *           type: string
- *           enum: [pending, completed]
- *           default: pending
- *           description: The status of the task
- *         priority:
- *           type: string
- *           enum: [low, medium, high]
- *           default: medium
- *           description: The priority of the task
- *         duration:
- *           type: integer
- *           description: The duration of the task in minutes
- *       example:
- *         id: "550e8400-e29b-41d4-a716-446655440000"
- *         title: "Team Meeting"
- *         date: "2023-05-15"
- *         startTime: "09:00"
- *         endTime: "10:00"
- *         location: "Conference Room A"
- *         category: "Meeting"
- *         isStaticSchedule: false
- *         status: "pending"
- *         priority: "medium"
- *         duration: 60
- * 
- *     TaskInput:
- *       type: object
- *       required:
- *         - title
- *         - date
- *         - startTime
- *         - endTime
- *         - category
- *         - isStaticSchedule
- *       properties:
- *         title:
- *           type: string
- *           description: The title of the task
- *         date:
- *           type: string
- *           format: date
- *           description: The date of the task (YYYY-MM-DD)
- *         startTime:
- *           type: string
- *           format: time
- *           pattern: '^\d{2}:\d{2}$'
- *           description: The start time of the task (HH:MM)
- *         endTime:
- *           type: string
- *           format: time
- *           pattern: '^\d{2}:\d{2}$'
- *           description: The end time of the task (HH:MM)
- *         location:
- *           type: string
- *           description: The location of the task
- *         category:
- *           type: string
- *           description: The category of the task
- *         isStaticSchedule:
- *           type: boolean
- *           description: Whether the task is part of a static schedule
- *       example:
- *         title: "Team Meeting"
- *         date: "2023-05-15"
- *         startTime: "09:00"
- *         endTime: "10:00"
- *         location: "Conference Room A"
- *         category: "Meeting"
- *         isStaticSchedule: false
- * 
- *     TaskUpdate:
- *       type: object
- *       properties:
- *         title:
- *           type: string
- *           description: The title of the task
- *         date:
- *           type: string
- *           format: date
- *           description: The date of the task (YYYY-MM-DD)
- *         startTime:
- *           type: string
- *           format: time
- *           pattern: '^\d{2}:\d{2}$'
- *           description: The start time of the task (HH:MM)
- *         endTime:
- *           type: string
- *           format: time
- *           pattern: '^\d{2}:\d{2}$'
- *           description: The end time of the task (HH:MM)
- *         location:
- *           type: string
- *           description: The location of the task
- *         category:
- *           type: string
- *           description: The category of the task
- *         isStaticSchedule:
- *           type: boolean
- *           description: Whether the task is part of a static schedule
- *         status:
- *           type: string
- *           enum: [pending, completed]
- *           description: The status of the task
- *         priority:
- *           type: string
- *           enum: [low, medium, high]
- *           description: The priority of the task
- *       example:
- *         title: "Updated Team Meeting"
- *         date: "2023-05-15"
- *         startTime: "10:00"
- *         endTime: "11:00"
- *         location: "Conference Room B"
- *         category: "Important Meeting"
- *         isStaticSchedule: true
- *         status: "pending"
- *         priority: "high"
- */
 
 export default router;
