@@ -14,7 +14,7 @@ const swaggerOptions = {
             },
         ],
     },
-    apis: ['../auth/routes.js'], // Path to the route files for Swagger annotations
+    apis: ['./auth/routes.js', './task/routes.js'], // Path to the route files for Swagger annotations
 };
 
 const swaggerDocs = swaggerJSDoc(swaggerOptions);

@@ -6,9 +6,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 
-// const authRoutes = require('./auth/routes');
 import authRoutes from './auth/routes.js';
-// const taskRoutes = require('./routes/taskRoutes');
+import taskRoutes from './task/routes.js';
 import swaggerDocs from './config/swaggerConfig.js';
 
 const app = express();
@@ -21,7 +20,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Routes
 app.use('/api/auth', authRoutes);
-// app.use('/api/tasks', taskRoutes);
+app.use('/api/tasks', taskRoutes);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
