@@ -1,12 +1,15 @@
-const express = require('express');
-const cors = require('cors');
-const passport = require('passport');
-const swaggerUi = require('swagger-ui-express');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import passport from 'passport';
+import swaggerUi from 'swagger-ui-express';
+import dotenv from "dotenv";
+dotenv.config();
 
-// const authRoutes = require('./routes/authRoutes');
+
+// const authRoutes = require('./auth/routes');
+import authRoutes from './auth/routes.js';
 // const taskRoutes = require('./routes/taskRoutes');
-const swaggerDocs = require('./config/swaggerConfig');
+import swaggerDocs from './config/swaggerConfig.js';
 
 const app = express();
 
@@ -17,7 +20,7 @@ app.use(passport.initialize());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Routes
-// app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 // app.use('/api/tasks', taskRoutes);
 
 app.use((err, req, res, next) => {
