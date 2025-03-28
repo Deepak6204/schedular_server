@@ -13,10 +13,19 @@ const swaggerOptions = {
                 url: `http://localhost:${process.env.PORT || 5000}`,
             },
         ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                },
+            },
+        },
     },
     apis: ['./auth/routes.js', './task/routes.js'], // Path to the route files for Swagger annotations
 };
 
 const swaggerDocs = swaggerJSDoc(swaggerOptions);
 
-export default swaggerDocs; 
+export default swaggerDocs;

@@ -21,6 +21,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use("/auth", authRoutes);
+
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
